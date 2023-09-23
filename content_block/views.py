@@ -22,11 +22,19 @@ class ContentBlockView(APIView):
     def post(self, request):
         audio_file = request.FILES['audio_file']
         
-        audio = AudioSegment.from_file(audio_file)
+        # Check the file extension to determine the format
+        file_extension = os.path.splitext(audio_file.name)[1].lower()
+        
+        if file_extension == '.m4a':
+            # Convert M4A to WAV
+            audio = AudioSegment.from_file(audio_file, format="m4a")
+        else:
+            # Assume the file is already in WAV format
+            audio = AudioSegment.from_file(audio_file)
+        
         audio = audio.set_channels(1) 
         audio = audio.set_frame_rate(16000)  
         audio = audio.set_sample_width(2) 
-        
         
         
         temp_wav_path = "./temp/temp_audio.wav" 
@@ -52,10 +60,10 @@ class ContentBlockView(APIView):
             else:
                 response[index] = 'N'
     
-        for i in range(len(cleaned_words), len(gen_cleaned_words)):
-            response[i] = 'N'
-        for i in range(len(gen_cleaned_words), len(cleaned_words)):
-            response[i] = 'N'
+        # Check if the length of cleaned_words is less than gen_cleaned_words
+        if len(cleaned_words) < len(gen_cleaned_words):
+            for i in range(len(cleaned_words), len(gen_cleaned_words)):
+                response[i] = 'N'
         
         json_response = json.dumps(response)
         response = json.loads(json_response)
@@ -70,4 +78,3 @@ class ContentBlockView(APIView):
         os.remove(temp_wav_path)
         
         return Response({'comparison_result': response, 'percentage_score': percentage_score[:5]}, status=status.HTTP_200_OK)
-
