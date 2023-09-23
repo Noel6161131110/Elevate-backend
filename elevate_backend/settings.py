@@ -41,11 +41,7 @@ INSTALLED_APPS = [
     'content_block'
 ]
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",  # Use InMemoryChannelLayer for development; use a more robust solution like Redis for production.
-    },
-}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
