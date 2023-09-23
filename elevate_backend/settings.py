@@ -76,7 +76,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'elevate_backend.wsgi.application'
 
-ASGI_APPLICATION = 'elevate_backend.asgi.application'
+#ASGI_APPLICATION = 'elevate_backend.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
