@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-import string, os, json, speech_recognition as sr
+import string, os, json
 from pydub import AudioSegment  
 import assemblyai as aai
 
