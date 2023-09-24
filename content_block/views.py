@@ -43,14 +43,14 @@ class ContentBlockView(APIView):
         
         data = request.data 
         
-        user_data = User.objects.filter(user_id=data['user_id'])
-        
-        if user_data.exists():
+        if data:
             content_data = Content(user_id=data['user_id'], content=cleaned_text)
             
             content_data.save()
             
             return Response({'message': cleaned_text}, status=status.HTTP_201_CREATED)
+        
+        return Response({'message': cleaned_text}, status=status.HTTP_200_OK)
     
     def post(self, request):
         
