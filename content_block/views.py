@@ -4,6 +4,7 @@ from rest_framework import status
 import string, os, json
 from pydub import AudioSegment  
 import assemblyai as aai
+import uuid
 
 aai.settings.api_key = f"de856eda098840949aef11ab8631b117"
 
@@ -20,6 +21,13 @@ class ContentBlockView(APIView):
         return Response({'message': cleaned_text}, status=status.HTTP_201_CREATED)
     
     def post(self, request):
+        
+        gen_cleaned_text = request.session.get('text', '')
+        
+        if gen_cleaned_text == '':
+            return Response({'message': 'Please generate a text first'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
         audio_file = request.FILES['audio_file']
         
         # Check the file extension to determine the format
@@ -36,8 +44,10 @@ class ContentBlockView(APIView):
         audio = audio.set_frame_rate(16000)  
         audio = audio.set_sample_width(2) 
         
+        unique_file_name = f"temp_audio_{uuid.uuid4().hex}.wav"
+        temp_wav_path = os.path.join("./temp/", unique_file_name)
         
-        temp_wav_path = "./temp/temp_audio.wav" 
+        
         audio.export(temp_wav_path, format="wav")
         
         transcriber = aai.Transcriber()
@@ -47,7 +57,6 @@ class ContentBlockView(APIView):
         
         cleaned_text = remove_punctuation(transcript.text)
         
-        gen_cleaned_text = request.session.get('text', '')
         
         cleaned_words = cleaned_text.split()
         gen_cleaned_words = gen_cleaned_text.split()
@@ -76,5 +85,7 @@ class ContentBlockView(APIView):
         percentage_score = str(percentage_score)
         
         os.remove(temp_wav_path)
+        
+        request.session.pop('text', None)
         
         return Response({'comparison_result': response, 'percentage_score': percentage_score[:5]}, status=status.HTTP_200_OK)
