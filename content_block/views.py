@@ -84,7 +84,7 @@ class ContentBlockView(APIView):
         
         percentage_score = str(percentage_score)
         
-        os.remove(temp_wav_path)
+        #os.remove(temp_wav_path)
         
         request.session.pop('text', None)
         
