@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 import string, os, json
 from pydub import AudioSegment  
+from .models import User, Content
 import assemblyai as aai
 import uuid
 
@@ -13,21 +14,62 @@ def remove_punctuation(text):
     cleaned_text = text.translate(translator)
     return cleaned_text
 
+class SignUpView(APIView): 
+    
+    def post(self, request): 
+        data = request.data
+        
+        user_data = User.objects.filter(user_id=data['user_id'])
+        
+        if user_data.exists():
+            
+            return Response({'message': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        user = User(name=data['name'], age=data['age'], email=data['email'], tags=data['tags'], user_id=data['user_id'])
+        
+        if user:
+            user.save()
+            
+            return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+        
+        return Response({'message': 'User not created'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+
 class ContentBlockView(APIView):
     def get(self, request):
         text_with_punctuation = "After discovering time travel via an ancient civilization, an alien race have become hostile and intend to destroy it. In response, the scientists create a time machine which, if complete, will guide the civilizations of both Earth and our universe to freedom"
         cleaned_text = remove_punctuation(text_with_punctuation)
-        request.session['text'] = cleaned_text
-        return Response({'message': cleaned_text}, status=status.HTTP_201_CREATED)
+        
+        data = request.data 
+        
+        user_data = User.objects.filter(user_id=data['user_id'])
+        
+        if user_data.exists():
+            content_data = Content(user_id=data['user_id'], content=cleaned_text)
+            
+            content_data.save()
+            
+            return Response({'message': cleaned_text}, status=status.HTTP_201_CREATED)
     
     def post(self, request):
         
-        gen_cleaned_text = request.session.get('text', '')
+        data = request.data
         
-        if gen_cleaned_text == '':
-            return Response({'message': 'Please generate a text first'}, status=status.HTTP_400_BAD_REQUEST)
+        user_data = User.objects.filter(user_id=data['user_id'])
+        
+        if not user_data:
+            
+            return Response({'message': 'User does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        content_data = Content.objects.filter(user_id=data['user_id']).last()
         
         
+        if content_data.audio_location:
+            
+            return Response({'message': 'Audio file already exists, generate another story or content'}, status=status.HTTP_400_BAD_REQUEST)
+        
+                    
         audio_file = request.FILES['audio_file']
         
         # Check the file extension to determine the format
@@ -59,7 +101,7 @@ class ContentBlockView(APIView):
         
         
         cleaned_words = cleaned_text.split()
-        gen_cleaned_words = gen_cleaned_text.split()
+        gen_cleaned_words = content_data.content.split()
         
         response = {}
        
@@ -86,6 +128,8 @@ class ContentBlockView(APIView):
         
         #os.remove(temp_wav_path)
         
-        request.session.pop('text', None)
+        content_data.audio_location = temp_wav_path
+        
+        content_data.save()
         
         return Response({'comparison_result': response, 'percentage_score': percentage_score[:5]}, status=status.HTTP_200_OK)
