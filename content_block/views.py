@@ -103,14 +103,14 @@ class ContentBlockView(APIView):
 
         for word1, word2 in zip(cleaned_words, gen_cleaned_words):
             if word1 == word2:
-                response.append({"is_correct": "A", "phonetics": "None"})
+                response.append({"is_correct": "A"})
             else:
-                response.append({"is_correct": "N", "phonetics": "None"})
+                response.append({"is_correct": "N"})
 
         # Add "N" for extra words in gen_cleaned_words
         if len(cleaned_words) < len(gen_cleaned_words):
             for i in range(len(cleaned_words), len(gen_cleaned_words)):
-                response.append({"is_correct": "N", "phonetics": self.get_phonetics(gen_cleaned_words[i])})
+                response.append({"is_correct": "N"})
 
         
         json_response = json.dumps(response)
