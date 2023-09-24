@@ -20,6 +20,13 @@ class ContentBlockView(APIView):
         return Response({'message': cleaned_text}, status=status.HTTP_201_CREATED)
     
     def post(self, request):
+        
+        gen_cleaned_text = request.session.get('text', '')
+        
+        if gen_cleaned_text == '':
+            return Response({'message': 'Please generate a text first'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
         audio_file = request.FILES['audio_file']
         
         # Check the file extension to determine the format
@@ -47,7 +54,6 @@ class ContentBlockView(APIView):
         
         cleaned_text = remove_punctuation(transcript.text)
         
-        gen_cleaned_text = request.session.get('text', '')
         
         cleaned_words = cleaned_text.split()
         gen_cleaned_words = gen_cleaned_text.split()
