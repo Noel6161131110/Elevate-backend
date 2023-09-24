@@ -4,6 +4,7 @@ from rest_framework import status
 import string, os, json
 from pydub import AudioSegment  
 import assemblyai as aai
+import uuid
 
 aai.settings.api_key = f"de856eda098840949aef11ab8631b117"
 
@@ -43,8 +44,10 @@ class ContentBlockView(APIView):
         audio = audio.set_frame_rate(16000)  
         audio = audio.set_sample_width(2) 
         
+        unique_file_name = f"temp_audio_{uuid.uuid4().hex}.wav"
+        temp_wav_path = os.path.join("./temp/", unique_file_name)
         
-        temp_wav_path = "./temp/temp_audio.wav" 
+        
         audio.export(temp_wav_path, format="wav")
         
         transcriber = aai.Transcriber()
@@ -82,5 +85,7 @@ class ContentBlockView(APIView):
         percentage_score = str(percentage_score)
         
         os.remove(temp_wav_path)
+        
+        request.session.pop('text', None)
         
         return Response({'comparison_result': response, 'percentage_score': percentage_score[:5]}, status=status.HTTP_200_OK)
