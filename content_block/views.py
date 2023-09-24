@@ -54,10 +54,10 @@ class ContentBlockView(APIView):
     
     def post(self, request):
         
-        data = request.data
+        data = request.POST.get('user_id')
 
         
-        content_data = Content.objects.filter(user_id=data['user_id']).last()
+        content_data = Content.objects.filter(user_id=data).last()
         
         
         if content_data.audio_location:
@@ -98,28 +98,30 @@ class ContentBlockView(APIView):
         cleaned_words = cleaned_text.split()
         gen_cleaned_words = content_data.content.split()
         
-        response = {}
-       
-        for index, (word1, word2) in enumerate(zip(cleaned_words, gen_cleaned_words)):
+
+        response = []
+
+        for word1, word2 in zip(cleaned_words, gen_cleaned_words):
             if word1 == word2:
-                response[index] = 'A'
+                response.append({"is_correct": "A", "phonetics": "None"})
             else:
-                response[index] = 'N'
-    
-        # Check if the length of cleaned_words is less than gen_cleaned_words
+                response.append({"is_correct": "N", "phonetics": "None"})
+
+        # Add "N" for extra words in gen_cleaned_words
         if len(cleaned_words) < len(gen_cleaned_words):
             for i in range(len(cleaned_words), len(gen_cleaned_words)):
-                response[i] = 'N'
+                response.append({"is_correct": "N", "phonetics": self.get_phonetics(gen_cleaned_words[i])})
+
         
         json_response = json.dumps(response)
         response = json.loads(json_response)
         
-        # Calculate the percentage score
-        num_words_with_a = sum(1 for value in response.values() if value == 'A')
-        total_num_words = len(cleaned_words)
-        percentage_score = (num_words_with_a / total_num_words) * 100
+        # # Calculate the percentage score
+        # num_words_with_a = sum(1 for value in response.values() if value == 'A')
+        # total_num_words = len(cleaned_words)
+        # percentage_score = (num_words_with_a / total_num_words) * 100
         
-        percentage_score = str(percentage_score)
+        # percentage_score = str(percentage_score)
         
         #os.remove(temp_wav_path)
         
@@ -127,4 +129,4 @@ class ContentBlockView(APIView):
         
         content_data.save()
         
-        return Response({'comparison_result': response, 'percentage_score': percentage_score[:5]}, status=status.HTTP_200_OK)
+        return Response({'comparison_result': response}, status=status.HTTP_200_OK)
