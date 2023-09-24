@@ -55,12 +55,7 @@ class ContentBlockView(APIView):
     def post(self, request):
         
         data = request.data
-        
-        user_data = User.objects.filter(user_id=data['user_id'])
-        
-        if not user_data:
-            
-            return Response({'message': 'User does not exist'}, status=status.HTTP_400_BAD_REQUEST)
+
         
         content_data = Content.objects.filter(user_id=data['user_id']).last()
         
