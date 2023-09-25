@@ -113,9 +113,9 @@ USE_I18N = True
 
 USE_TZ = True
 
-openai.api_key = "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"
+openai.api_key = os.environ.get('OPENAI_API_KEY')
 
-aai.settings.api_key = "de856eda098840949aef11ab8631b117"
+aai.settings.api_key = os.environ.get('ASSEMBLYAI_API_KEY')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
