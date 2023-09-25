@@ -32,11 +32,10 @@ class SignUpView(APIView):
     
     def delete(self, request, pk):
         
-        user_data = User.objects.filter(id=pk)
-        
-        
-        
-
+        pass
+    
+    
+    
 class ContentBlockView(APIView):
     def get(self, request):
 
@@ -46,7 +45,7 @@ class ContentBlockView(APIView):
         if data:
             user_data = User.objects.filter(user_id=data['user_id']).first()
             
-            #print(user_data[0].tags)
+            
             print(user_data.tags)
             
             text_with_punctuation = generate_story(user_data.tags)
