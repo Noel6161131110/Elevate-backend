@@ -9,9 +9,6 @@ import uuid
 from .story_generaton import generate_story, remove_punctuation
 
 
-aai.settings.api_key = os.environ.get('ASSEMBLYAI_API_KEY')
-
-
 class SignUpView(APIView): 
     
     def post(self, request): 
