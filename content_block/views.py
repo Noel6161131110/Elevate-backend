@@ -28,6 +28,13 @@ class SignUpView(APIView):
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
         
         return Response({'message': 'User not created'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+    def delete(self, request, pk):
+        
+        user_data = User.objects.filter(id=pk)
+        
+        
         
 
 class ContentBlockView(APIView):
@@ -39,7 +46,10 @@ class ContentBlockView(APIView):
         if data:
             user_data = User.objects.filter(user_id=data['user_id'])
             
-            text_with_punctuation = generate_story(user_data[0].tags)
+            print(user_data[0].tags)
+            print(user_data.tags)
+            
+            text_with_punctuation = generate_story(user_data.tags)
             
             cleaned_text = remove_punctuation(text_with_punctuation)
             
