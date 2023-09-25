@@ -3,7 +3,7 @@ import re
 from django.conf import settings
 
 
-openai.api_key = os.environ.get('OPENAI_API_KEY')
+
 
 def remove_punctuation(text):
     text = re.sub(r'[^\w\s]', '', text)

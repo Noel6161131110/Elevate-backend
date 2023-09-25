@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-import os
+import os, openai, assemblyai as aai
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -112,6 +112,10 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+openai.api_key = "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"
+
+aai.settings.api_key = "de856eda098840949aef11ab8631b117"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
