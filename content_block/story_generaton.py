@@ -15,7 +15,7 @@ def generate_story(genre):
     
 
     # Use f-strings for string interpolation to include the genre variable
-    prompt = f"Write a short story or paragraph on the genre {genre} with max word count of fifty words finish with a full stop, don't put gaps in the paragraph."
+    prompt = f"Write a short story on any one of the genre {genre} with max word count of fifty words finish the sentence once started , don't break the flow of the story."
 
     # Generate a response using the OpenAI API
     response = openai.Completion.create(
@@ -24,6 +24,7 @@ def generate_story(genre):
         max_tokens=50,  # Adjust the desired response length
         n=1,  # Number of responses to generate
         stop=None,  # You can specify a stopping criterion if needed
+        temperature=0.7,  # Adjust the temperature
     )
     
     generated_text = response.choices[0].text
