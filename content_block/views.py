@@ -6,7 +6,6 @@ from pydub import AudioSegment
 from .models import User, Content
 import assemblyai as aai
 import uuid
-import openai
 from .story_generaton import generate_story, remove_punctuation
 
 
