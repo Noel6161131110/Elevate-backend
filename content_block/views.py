@@ -44,9 +44,9 @@ class ContentBlockView(APIView):
         data = request.data 
         
         if data:
-            user_data = User.objects.filter(user_id=data['user_id'])
+            user_data = User.objects.filter(user_id=data['user_id']).first()
             
-            print(user_data[0].tags)
+            #print(user_data[0].tags)
             print(user_data.tags)
             
             text_with_punctuation = generate_story(user_data.tags)
