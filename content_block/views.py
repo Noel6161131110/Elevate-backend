@@ -6,13 +6,12 @@ from pydub import AudioSegment
 from .models import User, Content
 import assemblyai as aai
 import uuid
+import openai
+from .story_generaton import generate_story, remove_punctuation
 
-aai.settings.api_key = f"de856eda098840949aef11ab8631b117"
 
-def remove_punctuation(text):
-    translator = str.maketrans('', '', string.punctuation)
-    cleaned_text = text.translate(translator)
-    return cleaned_text
+aai.settings.api_key = os.environ.get('ASSEMBLYAI_API_KEY')
+
 
 class SignUpView(APIView): 
     
@@ -34,23 +33,27 @@ class SignUpView(APIView):
         
         return Response({'message': 'User not created'}, status=status.HTTP_400_BAD_REQUEST)
         
-        
 
 class ContentBlockView(APIView):
     def get(self, request):
-        text_with_punctuation = "After discovering time travel via an ancient civilization, an alien race have become hostile and intend to destroy it. In response, the scientists create a time machine which, if complete, will guide the civilizations of both Earth and our universe to freedom"
-        cleaned_text = remove_punctuation(text_with_punctuation)
+
         
         data = request.data 
         
         if data:
+            user_data = User.objects.filter(user_id=data['user_id'])
+            
+            text_with_punctuation = generate_story(user_data[0].tags)
+            
+            cleaned_text = remove_punctuation(text_with_punctuation)
+            
             content_data = Content(user_id=data['user_id'], content=cleaned_text)
             
             content_data.save()
             
             return Response({'message': cleaned_text}, status=status.HTTP_201_CREATED)
         
-        return Response({'message': cleaned_text}, status=status.HTTP_200_OK)
+        return Response({'message': 'Please give all the credientials'}, status=status.HTTP_200_OK)
     
     def post(self, request):
         
@@ -116,14 +119,6 @@ class ContentBlockView(APIView):
         json_response = json.dumps(response)
         response = json.loads(json_response)
         
-        # # Calculate the percentage score
-        # num_words_with_a = sum(1 for value in response.values() if value == 'A')
-        # total_num_words = len(cleaned_words)
-        # percentage_score = (num_words_with_a / total_num_words) * 100
-        
-        # percentage_score = str(percentage_score)
-        
-        #os.remove(temp_wav_path)
         
         content_data.audio_location = temp_wav_path
         
