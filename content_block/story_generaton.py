@@ -1,7 +1,9 @@
-import os, string, openai
+import openai, os
 import re
+from django.conf import settings
 
 
+openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 def remove_punctuation(text):
     text = re.sub(r'[^\w\s]', '', text)
@@ -10,7 +12,7 @@ def remove_punctuation(text):
     return text
 
 def generate_story(genre):
-    openai.api_key = os.environ.get('OPENAI_API_KEY')
+    
 
     # Use f-strings for string interpolation to include the genre variable
     prompt = f"Write a short story or paragraph on the genre {genre} with max word count of fifty words finish with a full stop, don't put gaps in the paragraph."
